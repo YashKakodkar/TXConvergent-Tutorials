@@ -1,21 +1,52 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, FlatList, TouchableOpacity } from "react-native";
+import firebase from "firebase";
+import "firebase/firestore";
 
 export default class Feed extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      tweets: [],
+    };
   }
+
+  componentDidMount() {
+    const tweetsRef = firebase.firestore().collection("tweets");
+    tweetsRef.orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+      var tweets = [];
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        var tweetData = doc.data();
+        var tweet = {
+          id: doc.id,
+          username: tweetData.username,
+          userID: tweetData.userID,
+          body: tweetData.tweetBody,
+          likes: tweetData.likes,
+          data: tweetData.timestamp,
+        };
+        tweets.push(tweet);
+      });
+      this.setState({ tweets });
+    });
+  }
+
+  renderTweet = ({ item }) => (
+    <View style={{ width: "100%", marginBottom: 10, backgroundColor: "lightgrey" }}>
+      <Text style={{ color: "black", fontWeight: "bold" }}>{item.username}</Text>
+      <Text>{item.body}</Text>
+    </View>
+  );
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{ color: "black", fontSize: 30, fontWeight: "700" }}>
-          Feed page 1
-        </Text>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate("FeedTwo")}>
-          <Text>Next</Text>
-        </TouchableOpacity>
+        <FlatList
+          style={{ width: "100%" }}
+          data={this.state.tweets}
+          renderItem={this.renderTweet}
+        ></FlatList>
       </View>
     );
   }

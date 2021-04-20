@@ -5,6 +5,7 @@ import { NavigationContainer } from "@react-navigation/native";
 
 //import screens
 import Login from "./screens/Login/Login";
+import Signup from "./screens/Signup/Signup";
 import Feed from "./screens/Feed/Feed";
 import FeedTwo from "./screens/Feed/FeedTwo";
 import Posting from "./screens/Posting/Posting";
@@ -34,6 +35,9 @@ export default class Navigation extends Component {
       >
         <AuthStack.Screen name="Login">
           {(props) => <Login {...props} />}
+        </AuthStack.Screen>
+        <AuthStack.Screen name="Signup">
+          {(props) => <Signup {...props} />}
         </AuthStack.Screen>
         <AuthStack.Screen
           {...(props) => <TabNavigation {...props} />}
@@ -77,16 +81,29 @@ export default class Navigation extends Component {
           name="Feed"
           component={this.FeedNavigation}
         />
-        <Tab.Screen name="Post" component={this.PostingNavigation} />
-        <Tab.Screen name="Profile" component={this.ProfileNavigation} />
+        <Tab.Screen
+          {...(props) => <PostingNavigation {...props} />}
+          name="Post"
+          component={this.PostingNavigation}
+        />
+        <Tab.Screen
+          {...(props) => <ProfileNavigation {...props} />}
+          name="Profile"
+          component={this.ProfileNavigation}
+        />
       </Tab.Navigator>
     );
   };
 
   render() {
+    console.log(`logout: ${this.props.isLoggedIn}`);
     return (
       <NavigationContainer>
-        <this.AuthNavigation></this.AuthNavigation>
+        {this.props.isLoggedIn ? (
+          <this.TabNavigation> </this.TabNavigation>
+        ) : (
+          <this.AuthNavigation></this.AuthNavigation>
+        )}
       </NavigationContainer>
     );
   }

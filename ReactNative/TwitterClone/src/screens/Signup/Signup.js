@@ -2,24 +2,35 @@ import React, { Component } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
 import Navigation from "../../Navigation";
 import firebase from "firebase";
+import "firebase/firestore";
 
-export default class Login extends Component {
+export default class Signup extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: "",
       email: "",
       password: "",
     };
   }
 
-  onLogin = () => {
-    const { email, password } = this.state;
+  onSignup = () => {
+    const { username, email, password } = this.state;
+    console.log(`Username: ${username}`);
     console.log(`Email: ${email}`);
     console.log(`Password: ${password}`);
     firebase
       .auth()
-      .signInWithEmailAndPassword(email, password)
+      .createUserWithEmailAndPassword(email, password)
       .then((result) => {
+        firebase
+          .firestore()
+          .collection("users")
+          .doc(firebase.auth().currentUser.uid)
+          .set({
+            username,
+            email,
+          });
         console.log(result);
       })
       .catch((error) => {
@@ -31,6 +42,13 @@ export default class Login extends Component {
     return (
       <View style={styles.container}>
         <Text style={{ color: "white", fontSize: 30, fontWeight: "700" }}>Twitter</Text>
+        <TextInput
+          style={styles.textInput}
+          placeholder="Username"
+          onChangeText={(username) => {
+            this.setState({ username });
+          }}
+        ></TextInput>
         <TextInput
           style={styles.textInput}
           placeholder="Email"
@@ -45,16 +63,8 @@ export default class Login extends Component {
             this.setState({ password });
           }}
         ></TextInput>
-        <TouchableOpacity style={styles.loginButtonContainer} onPress={this.onLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.signupButtonContainer}>
-          <Text
-            style={styles.signupButtonText}
-            onPress={() => this.props.navigation.navigate("Signup")}
-          >
-            Sign up
-          </Text>
+        <TouchableOpacity style={styles.loginButtonContainer} onPress={this.onSignup}>
+          <Text style={styles.loginButtonText}>Sign up</Text>
         </TouchableOpacity>
       </View>
     );
