@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
-import firebase from "firebase";
-import "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getFirestore, doc, addDoc, getDoc, collection } from "firebase/firestore";
 
 export default class Posting extends Component {
   constructor(props) {
@@ -13,20 +13,21 @@ export default class Posting extends Component {
 
   onPost = async () => {
     const { tweetBody } = this.state;
-    const db = firebase.firestore();
-    const userID = firebase.auth().currentUser.uid;
+
+    // Make service references
+    const db = getFirestore();
+    const auth = getAuth();
+    const userID = auth.currentUser.uid;
     var username = "";
     var profileColor = "lightgrey";
-    await db
-      .collection("users")
-      .doc(userID)
-      .get()
-      .then((doc) => {
-        username = doc.data().username;
-        profileColor = doc.data().profileColor;
-        console.log(username);
-      });
-    db.collection("tweets").add({
+    const userDoc = await getDoc(doc(db, "users", userID));
+    if (userDoc.exists) {
+      username = userDoc.data().username;
+      profileColor = userDoc.data().profileColor;
+    }
+
+    // Add a doc to the db
+    addDoc(collection(db, "tweets"), {
       userID: userID,
       username: username,
       profileColor: profileColor,

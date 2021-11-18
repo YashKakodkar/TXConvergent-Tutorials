@@ -6,13 +6,13 @@ import Navigation from "./src/Navigation";
 import Login from "./src/screens/Login/Login";
 
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
-  measurementId: "",
+  apiKey: "AIzaSyAzlibCz1x_rNOTYZXXR030Z08T-iokxII",
+  authDomain: "twitterclone-1f2d6.firebaseapp.com",
+  projectId: "twitterclone-1f2d6",
+  storageBucket: "twitterclone-1f2d6.appspot.com",
+  messagingSenderId: "882125666574",
+  appId: "1:882125666574:web:af41381ba0444211633f5f",
+  measurementId: "G-E93YJWV6CV",
 };
 
 if (firebase.apps.length === 0) {
@@ -43,7 +43,7 @@ export default class App extends Component {
   }
 
   render() {
-    return <Navigation isLoggedIn={this.state.isLoggedIn}></Navigation>;
+    return <Navigation isLoggedIn={false}></Navigation>;
   }
 }
 

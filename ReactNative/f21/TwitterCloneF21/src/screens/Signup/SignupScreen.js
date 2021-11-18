@@ -1,24 +1,23 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
-import Navigation from "../../Navigation";
-import firebase from "firebase";
-import "firebase/firestore";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
-export default class Signup extends Component {
+class SignupScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
       email: "",
       password: "",
+      username: "",
     };
   }
 
   onSignup = () => {
+    // Grab inputted user credentials from state
     const { username, email, password } = this.state;
-    console.log(`Username: ${username}`);
-    console.log(`Email: ${email}`);
-    console.log(`Password: ${password}`);
+
+    // List of colors that'll be randomly set to serve as display picture
     var profileColors = [
       "brown",
       "coral",
@@ -28,20 +27,22 @@ export default class Signup extends Component {
       "forestgreen",
     ];
     const profileColor = profileColors[Math.floor(Math.random() * profileColors.length)];
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then((result) => {
-        firebase
-          .firestore()
-          .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            username,
-            email,
-            profileColor,
-          });
-        console.log(result);
+
+    // Grab auth and data base references
+    const auth = getAuth();
+    const db = getFirestore();
+
+    // Create a new user with email and password
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Set a document with the specified user credential taken from auth
+        setDoc(doc(db, "users", userCredential.user.uid), {
+          username,
+          email,
+          profileColor,
+        }).then((result) => {
+          console.log(result);
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -73,8 +74,8 @@ export default class Signup extends Component {
             this.setState({ password });
           }}
         ></TextInput>
-        <TouchableOpacity style={styles.loginButtonContainer} onPress={this.onSignup}>
-          <Text style={styles.loginButtonText}>Sign up</Text>
+        <TouchableOpacity style={styles.signUpButtonContainer} onPress={this.onSignup}>
+          <Text style={styles.signUpButtonText}>Sign up</Text>
         </TouchableOpacity>
       </View>
     );
@@ -87,9 +88,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#1da1f2",
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
   },
 
-  loginButtonContainer: {
+  signUpButtonContainer: {
     backgroundColor: "white",
     borderRadius: 50,
     width: 250,
@@ -99,26 +101,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  loginButtonText: {
+  signUpButtonText: {
     fontSize: 18,
     fontWeight: "600",
     color: "#1da1f2",
-  },
-
-  signupButtonContainer: {
-    backgroundColor: "black",
-    borderRadius: 50,
-    width: 250,
-    height: 40,
-    margin: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  signupButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "white",
   },
 
   textInput: {
@@ -130,3 +116,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 });
+
+export default SignupScreen;

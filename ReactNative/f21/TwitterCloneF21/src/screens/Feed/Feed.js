@@ -1,8 +1,13 @@
 import React, { Component } from "react";
 import { StyleSheet, View, Text, FlatList, TouchableOpacity } from "react-native";
 import Tweet from "../../components/Feed/Tweet";
-import firebase from "firebase";
-import "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+} from "@firebase/firestore";
 
 export default class Feed extends Component {
   constructor(props) {
@@ -13,9 +18,16 @@ export default class Feed extends Component {
   }
 
   componentDidMount() {
-    const tweetsRef = firebase.firestore().collection("tweets");
-    tweetsRef.orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+    // Make your references and queries
+    const db = getFirestore();
+    const tweetsRef = collection(db, "tweets");
+    const feedQuery = query(tweetsRef, orderBy("timestamp", "desc"));
+
+    // Get you data
+    onSnapshot(feedQuery, (querySnapshot) => {
       var tweets = [];
+
+      // Create object out of each doc and add it to a list
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         var tweetData = doc.data();

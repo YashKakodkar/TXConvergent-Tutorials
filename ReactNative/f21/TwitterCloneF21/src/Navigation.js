@@ -5,8 +5,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 //import screens
-import Login from "./screens/Login/Login";
-import Signup from "./screens/Signup/Signup";
+import LoginScreen from "./screens/Login/LoginScreen";
+import SignupScreen from "./screens/Signup/SignupScreen";
 import Feed from "./screens/Feed/Feed";
 import FeedTwo from "./screens/Feed/FeedTwo";
 import Posting from "./screens/Posting/Posting";
@@ -35,16 +35,11 @@ export default class Navigation extends Component {
         screenOptions={{ headerShown: false }}
       >
         <AuthStack.Screen name="Login">
-          {(props) => <Login {...props} />}
+          {(props) => <LoginScreen {...props} />}
         </AuthStack.Screen>
         <AuthStack.Screen name="Signup">
-          {(props) => <Signup {...props} />}
+          {(props) => <SignupScreen {...props} />}
         </AuthStack.Screen>
-        <AuthStack.Screen
-          {...(props) => <TabNavigation {...props} />}
-          name="Home"
-          component={this.TabNavigation}
-        ></AuthStack.Screen>
       </AuthStack.Navigator>
     );
   };
@@ -52,8 +47,10 @@ export default class Navigation extends Component {
   FeedNavigation = (props) => {
     return (
       <FeedStack.Navigator initialRouteName="Feed">
-        <FeedStack.Screen name="Feed" component={Feed} />
-        <FeedStack.Screen name="FeedTwo" component={FeedTwo} />
+        <FeedStack.Screen name="Feed">{(props) => <Feed {...props} />}</FeedStack.Screen>
+        <FeedStack.Screen name="FeedTwo">
+          {(props) => <FeedTwo {...props} />}
+        </FeedStack.Screen>
       </FeedStack.Navigator>
     );
   };
@@ -61,7 +58,9 @@ export default class Navigation extends Component {
   PostingNavigation = (props) => {
     return (
       <PostingStack.Navigator initialRouteName="Posting">
-        <PostingStack.Screen name="Posting" component={Posting} />
+        <PostingStack.Screen name="Posting">
+          {(props) => <Posting {...props} />}
+        </PostingStack.Screen>
       </PostingStack.Navigator>
     );
   };
@@ -69,7 +68,9 @@ export default class Navigation extends Component {
   ProfileNavigation = (props) => {
     return (
       <ProfileStack.Navigator initialRouteName="Profile">
-        <ProfileStack.Screen name="Profile" component={Profile} />
+        <ProfileStack.Screen name="Profile">
+          {(props) => <Profile {...props} />}
+        </ProfileStack.Screen>
       </ProfileStack.Navigator>
     );
   };
@@ -78,6 +79,7 @@ export default class Navigation extends Component {
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
+          headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
@@ -117,7 +119,6 @@ export default class Navigation extends Component {
   };
 
   render() {
-    console.log(`logout: ${this.props.isLoggedIn}`);
     return (
       <NavigationContainer>
         {this.props.isLoggedIn ? (

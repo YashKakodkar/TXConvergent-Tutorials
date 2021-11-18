@@ -1,46 +1,24 @@
 import React, { Component } from "react";
-import { StyleSheet, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity } from "react-native";
 import Navigation from "../../Navigation";
-import firebase from "firebase";
-import "firebase/firestore";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
-export default class Signup extends Component {
+class LoginScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: "",
       email: "",
       password: "",
     };
   }
 
-  onSignup = () => {
-    const { username, email, password } = this.state;
-    console.log(`Username: ${username}`);
-    console.log(`Email: ${email}`);
-    console.log(`Password: ${password}`);
-    var profileColors = [
-      "brown",
-      "coral",
-      "crimson",
-      "blueviolet",
-      "gold",
-      "forestgreen",
-    ];
-    const profileColor = profileColors[Math.floor(Math.random() * profileColors.length)];
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
+  onLogin = () => {
+    const { email, password } = this.state;
+    const auth = getAuth();
+
+    // Sign in a user with email and password
+    signInWithEmailAndPassword(auth, email, password)
       .then((result) => {
-        firebase
-          .firestore()
-          .collection("users")
-          .doc(firebase.auth().currentUser.uid)
-          .set({
-            username,
-            email,
-            profileColor,
-          });
         console.log(result);
       })
       .catch((error) => {
@@ -52,13 +30,6 @@ export default class Signup extends Component {
     return (
       <View style={styles.container}>
         <Text style={{ color: "white", fontSize: 30, fontWeight: "700" }}>Twitter</Text>
-        <TextInput
-          style={styles.textInput}
-          placeholder="Username"
-          onChangeText={(username) => {
-            this.setState({ username });
-          }}
-        ></TextInput>
         <TextInput
           style={styles.textInput}
           placeholder="Email"
@@ -73,8 +44,14 @@ export default class Signup extends Component {
             this.setState({ password });
           }}
         ></TextInput>
-        <TouchableOpacity style={styles.loginButtonContainer} onPress={this.onSignup}>
-          <Text style={styles.loginButtonText}>Sign up</Text>
+        <TouchableOpacity style={styles.loginButtonContainer} onPress={this.onLogin}>
+          <Text style={styles.loginButtonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.signupButtonContainer}
+          onPress={() => this.props.navigation.navigate("Signup")}
+        >
+          <Text style={styles.signupButtonText}>Signup</Text>
         </TouchableOpacity>
       </View>
     );
@@ -130,3 +107,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 });
+
+export default LoginScreen;
